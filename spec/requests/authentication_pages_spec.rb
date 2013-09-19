@@ -4,19 +4,17 @@ describe "Authentication" do
 
   subject { page }
 
-  describe "signin" do
+  describe "authorization" do
 
-    before { visit signin_path }
+     describe "as non-admin user" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:non_admin) { FactoryGirl.create(:user) }
 
-    describe "with invalid information" do
-      before { click_button "Sign in" }
+      before { sign_in non_admin, no_capybara: true }
 
-      it { should have_title('Sign in') }
-      it { should have_selector('div.alert.alert-error', text: 'Invalid') }
-
-      describe "followed by signout" do
-        before { click_link "Sign out" }
-        it { should have_link('Sign in') }
+      describe "submitting a DELETE request to the Users#destroy action" do
+        before { delete user_path(user) }
+        specify { expect(response).to redirect_to(root_url) }
       end
     end
   end
